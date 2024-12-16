@@ -1,0 +1,126 @@
+image: atlassian/default-image:2
+
+definitions:
+  services:
+    docker:
+      memory: 7128
+  steps:
+    - step: &Build-Image
+        name: Build Image
+        services:
+          - docker
+        script:
+          - VERSION="${BITBUCKET_BRANCH}-${BITBUCKET_BUILD_NUMBER}"
+          - echo $VERSION
+          - docker build -t identityserver .
+          - pipe: atlassian/aws-ecr-push-image:1.4.2
+            variables:
+              AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+              AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+              AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+              IMAGE_NAME: identityserver
+              TAGS: "${VERSION}"
+              DEBUG: "true"
+    - step: &Deploy-Dev
+       name: Deploy Dev
+       script:
+          - VERSION="${BITBUCKET_BRANCH}-$(echo $BITBUCKET_COMMIT | cut -c1-7)"
+          - MIN_REPLICAS="${MIN_REPLICAS}"
+          - MAX_REPLICAS="{MAX_REPLICAS}"
+          - envsubst < dev-deployment.tpl.yaml > deployment-${BITBUCKET_BRANCH}.yaml
+          - pipe: atlassian/aws-eks-kubectl-run:2.2.0
+            variables:
+              AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+              AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+              AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+              CLUSTER_NAME: $CLUSTER_NAME
+              KUBECTL_COMMAND: "apply"
+              RESOURCE_PATH: "deployment-${BITBUCKET_BRANCH}.yaml"
+              DEBUG: "true"
+    - step: &Deploy-Test
+       name: Deploy Test
+       script:
+          - VERSION="${BITBUCKET_BRANCH}-$(echo $BITBUCKET_COMMIT | cut -c1-7)"
+          - MIN_REPLICAS="${MIN_REPLICAS}"
+          - MAX_REPLICAS="{MAX_REPLICAS}"
+          - envsubst < test-deployment.tpl.yaml > deployment-${BITBUCKET_BRANCH}.yaml
+          - pipe: atlassian/aws-eks-kubectl-run:2.2.0
+            variables:
+              AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+              AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+              AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+              CLUSTER_NAME: $CLUSTER_NAME
+              KUBECTL_COMMAND: "apply"
+              RESOURCE_PATH: "deployment-${BITBUCKET_BRANCH}.yaml"
+              DEBUG: "true"
+    - step: &Deploy-Staging
+       name: Deploy Staging
+       script:
+          - VERSION="${BITBUCKET_BRANCH}-$(echo $BITBUCKET_COMMIT | cut -c1-7)"
+          - MIN_REPLICAS="${MIN_REPLICAS}"
+          - MAX_REPLICAS="{MAX_REPLICAS}"
+          - eval $(sed -i "s/<DEP_ENV>/$DEP_ENV/g" ./stage-deployment.tpl.yaml)
+          - envsubst < stage-deployment.tpl.yaml > deployment-${BITBUCKET_BRANCH}.yaml
+          - pipe: atlassian/aws-eks-kubectl-run:2.2.0
+            variables:
+              AWS_ACCESS_KEY_ID: ${PROD_AWS_ACCESS_KEY_ID}
+              AWS_SECRET_ACCESS_KEY: ${PROD_AWS_SECRET_ACCESS_KEY}
+              AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+              CLUSTER_NAME: $PROD_CLUSTER_NAME
+              KUBECTL_COMMAND: "apply"
+              RESOURCE_PATH: "deployment-${BITBUCKET_BRANCH}.yaml"
+              DEBUG: "true"
+    - step: &Deploy-Production
+       name: Deploy Production
+       trigger: manual
+       script:
+          - VERSION="${BITBUCKET_BRANCH}-$(echo $BITBUCKET_COMMIT | cut -c1-7)"
+          - MIN_REPLICAS="${MIN_REPLICAS}"
+          - MAX_REPLICAS="{MAX_REPLICAS}"
+          - eval $(sed -i "s/<DEP_ENV>/$DEP_ENV/g" ./stage-deployment.tpl.yaml)
+          - envsubst < stage-deployment.tpl.yaml > deployment-${BITBUCKET_BRANCH}.yaml
+          - pipe: atlassian/aws-eks-kubectl-run:2.2.0
+            variables:
+              AWS_ACCESS_KEY_ID: ${PROD_AWS_ACCESS_KEY_ID}
+              AWS_SECRET_ACCESS_KEY: ${PROD_AWS_SECRET_ACCESS_KEY}
+              AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+              CLUSTER_NAME: $PROD_CLUSTER_NAME
+              KUBECTL_COMMAND: "apply"
+              RESOURCE_PATH: "deployment-${BITBUCKET_BRANCH}.yaml"
+              DEBUG: "true"
+
+
+options:
+  size: 2x
+
+pipelines:
+
+  branches:
+    development:
+      - step:
+         <<: *Build-Image
+         name: Build-Image
+         deployment: Development
+      - step: *Deploy-Dev
+    test:
+      - step:
+         <<: *Build-Image
+         name: Build-Image
+         deployment: Test
+      - step: *Deploy-Test
+    staging:
+      - step:
+         <<: *Build-Image
+         name: Build-Image
+      - step: 
+         <<: *Deploy-Staging
+         name: Deploy to K8
+         deployment: Staging
+    master:
+      - step:
+          <<: *Build-Image
+          name: Build-Image
+      - step: 
+          <<: *Deploy-Production
+          name: Deploy to K8
+          deployment: Production

@@ -1,0 +1,156 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>settl.identityserver.API</name>
+    </assembly>
+    <members>
+        <member name="M:settl.identityserver.API.Controllers.AuthenticationController.GetRefreshToken(settl.identityserver.Application.Contracts.DTO.Users.RefreshTokenDTO)">
+            <summary>
+            Obtain new access token after expiry using the refresh token that came with the expired access token
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:settl.identityserver.API.Controllers.AuthenticationController.ValidateToken(System.String)">
+            <summary>
+            Validates a settl user's access token
+            </summary>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:settl.identityserver.API.Controllers.AuthenticationController.ValidateAccessToken(System.String)">
+            <summary>
+            Validates an admin user's access token
+            </summary>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:settl.identityserver.API.Controllers.DocumentController.UploadImageToS3BucketAsync(settl.identityserver.Application.Contracts.DTOs.ApiCallFileUploadDto)">
+            <summary>
+            Uploads a file to an S3 bucket with specified path to the image
+            </summary>
+            <param name="request"></param>
+            <returns>Document can be uploaded as a file or a base64String</returns>
+            <returns>An AWSUploadResult with the link to the uploaded content, if successful</returns>
+            <returns>example of filetype - (passport,driver license etc)</returns>
+        </member>
+        <member name="M:settl.identityserver.API.Controllers.IdentityController.SignUp(settl.identityserver.Application.Contracts.DTO.Account.CreateUserDTO)">
+            <summary>
+            Create a user on Settl
+            </summary>
+            <param name="createUserDTO"></param>
+            <returns></returns>
+        </member>
+        <member name="M:settl.identityserver.API.Controllers.IdentityController.SetupPassword(settl.identityserver.Application.Contracts.DTO.password.CreatePasswordDTO)">
+            <summary>
+            Create a password
+            </summary>
+            <param name="passwordDTO">username can be phone numbe or email</param>
+            <returns></returns>
+        </member>
+        <member name="M:settl.identityserver.API.Controllers.IdentityController.signin(settl.identityserver.Application.Contracts.DTO.Account.SignInDTO)">
+            <summary>
+            Log User into the app
+            </summary>
+            <param name="signInDTO"></param>
+            <returns></returns>
+        </member>
+        <member name="M:settl.identityserver.API.Controllers.IdentityController.SignOut(System.String)">
+            <summary>
+            Log users out of the app
+            </summary>
+            <param name="phone"></param>
+            <returns></returns>
+        </member>
+        <member name="M:settl.identityserver.API.Controllers.IdentityController.PullDownToRefresh">
+            <summary>
+             Returns consumer's new information when users refresh their home screen
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:settl.identityserver.API.Controllers.IdentityController.ForgotPassword(settl.identityserver.Application.Contracts.DTO.Account.ResetPasswordDTO)">
+            <summary>
+            Allows consumers to reset their password with transaction pin
+            </summary>
+            <param name="resetPassword"></param>
+            <returns></returns>
+        </member>
+        <member name="M:settl.identityserver.API.Controllers.IdentityController.ChangePassword(settl.identityserver.Application.Contracts.DTO.Account.ChangePasswordDTO)">
+            <summary>
+            Allows consumers to change their password to a new one
+            </summary>
+            <param name="forgotConsumerPasswordDTO"></param>
+            <returns></returns>
+        </member>
+        <member name="M:settl.identityserver.API.Controllers.IdentityController.VerifyPassword(settl.identityserver.Application.Contracts.DTO.Account.VerifyPasswordDTO)">
+            <summary>
+            Allows users to verify their password
+            </summary>
+            <param name="verify"></param>
+            <returns></returns>
+        </member>
+        <member name="M:settl.identityserver.API.Controllers.IdentityController.RefreshToken(settl.identityserver.Application.Contracts.DTO.Users.RefreshTokenDTO)">
+            <summary>
+            Authenticate consumers using previously obtained refresh token during log in and sign up
+            </summary>
+            <param name="payload"></param>
+            <returns></returns>
+        </member>
+        <member name="M:settl.identityserver.API.Controllers.IdentityController.FreezeWallet(settl.identityserver.Application.Contracts.DTO.Admin.FreezeWalletDTO)">
+            <summary>
+            Freeze/Unfreeze a consumer's wallet
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:settl.identityserver.API.Controllers.OTPController.Create(settl.identityserver.Application.Contracts.DTO.OTP.SendSMSDTO)">
+             <summary>
+             Send One Time Passwords to Settl Users to complete authenticated processes
+             </summary>
+            <remarks>For OtpTypes, SIGN_IN = 1, PHONE_NUMBER_VALIDATION = 2, FORGOT_PASSWORD = 3</remarks>
+            <param></param>
+        </member>
+        <member name="M:settl.identityserver.API.Controllers.OTPController.Verify(settl.identityserver.Application.Contracts.DTO.OTP.VerifyOTPDTO)">
+            <summary>
+            Verify OTPs sent to customers
+            </summary>
+            <param name="verifyOTPDTO"></param>
+            <returns></returns>
+        </member>
+        <member name="M:settl.identityserver.API.Controllers.UsersController.Get(System.String)">
+            <summary>
+            Get a user by their phone number
+            </summary>
+            <param name="phone"></param>
+            <returns></returns>
+        </member>
+        <member name="M:settl.identityserver.API.Controllers.UsersController.GetByEmail(System.String)">
+            <summary>
+            Get a user by their phone number or email
+            </summary>
+            <param name="email"></param>
+            <returns></returns>
+        </member>
+        <member name="M:settl.identityserver.API.Controllers.UsersController.GetUsersWithDate(settl.identityserver.Application.Contracts.DTO.Users.UserDateFilter)">
+            <summary>
+            Get Users with number of days
+            </summary>
+            <param name="query">30 for the last 30 days, pass 0 to get data for today
+             <p>2021-08-09</p>
+            </param>
+            <returns></returns>
+        </member>
+        <member name="M:settl.identityserver.API.Controllers.UsersController.GetAppDownloads(settl.identityserver.Application.Contracts.DTO.Users.UserDateFilter)">
+            <summary>
+            Get breakdown of app downloads of consumers and agents
+            </summary>
+            <param name="query"></param>
+            <returns></returns>
+        </member>
+        <member name="T:settl.identityserver.API.TokenValidationFilterAttribute">
+            <summary>
+            Filter to validate Bearer Token Authorization for requests
+            </summary>
+        </member>
+    </members>
+</doc>

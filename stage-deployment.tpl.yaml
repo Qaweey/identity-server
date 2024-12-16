@@ -1,0 +1,133 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: identityserver
+  namespace: <DEP_ENV>
+spec:
+  selector:
+    matchLabels:
+      app: identityserver
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: identityserver
+    spec:
+        containers:
+        - name: identityserver
+          image: ${IMAGE_URL}/identityserver:${BITBUCKET_BRANCH}-${BITBUCKET_BUILD_NUMBER}
+          env:
+          - name: ELASTIC_APM_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: settl-secrets
+                key: ELASTIC_APM_API_KEY
+          - name: ELASTIC_APM_ENVIRONMENT
+            valueFrom:
+              secretKeyRef:
+                name: settl-secrets
+                key: ELASTIC_APM_ENVIRONMENT
+          - name: JWT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: settl-secrets
+                key: JWT_SECRET
+          - name: ELASTIC_APM_HOSTNAME
+            valueFrom:
+              secretKeyRef:
+                name: settl-secrets
+                key: ELASTIC_APM_HOSTNAME
+          - name: ELASTIC_APM_SECRETTOKEN
+            valueFrom:
+              secretKeyRef:
+                name: settl-secrets
+                key: ELASTIC_APM_SECRETTOKEN
+          - name: ELASTIC_APM_SERVER_URL
+            valueFrom:
+              secretKeyRef:
+                name: settl-secrets
+                key: ELASTIC_APM_SERVER_URL
+          - name: SMILEIDENTITY_CALLBACK
+            valueFrom:
+              secretKeyRef:
+                name: settl-secrets
+                key: SMILEIDENTITY_CALLBACK
+          - name: HANGFIREDB_CONN
+            valueFrom:
+              secretKeyRef:
+                name: settl-secrets
+                key: HANGFIREDB_CONN
+          - name: SETTL_API_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: settl-secrets
+                key: SETTL_API_TOKEN
+          - name: REDIS_CACHE_DB_CONN
+            valueFrom:
+              secretKeyRef:
+                name: settl-secrets
+                key: REDIS_CACHE_DB_CONN
+          - name: SMILE_APIKEY
+            valueFrom:
+              secretKeyRef:
+                name: settl-secrets
+                key: SMILE_APIKEY
+          - name: SMILEIDENTITY_URL
+            valueFrom:
+              secretKeyRef:
+                name: settl-secrets
+                key: SMILEIDENTITY_URL
+          - name: IDENTITYSERVER_TOKEN_ENDPOINT
+            valueFrom:
+              secretKeyRef:
+                name: settl-secrets
+                key: IDENTITYSERVER_TOKEN_ENDPOINT
+          - name: DB_CONNECTION
+            valueFrom:
+              secretKeyRef:
+                name: settl-secrets
+                key: DB_CONNECTION
+          - name: ASPNETCORE_ENVIRONMENT
+            valueFrom:
+              secretKeyRef:
+                name: settl-secrets
+                key: ASPNETCORE_ENVIRONMENT          
+          - name: API_URL
+            valueFrom:
+              secretKeyRef:
+                name: settl-secrets
+                key: API_URL
+          - name: DB_CONNECTION2
+            valueFrom:
+              secretKeyRef:
+                name: settl-secrets
+                key: DB_CONNECTION2                
+          - name: SETTL_STORE_PHONE
+            valueFrom:
+              secretKeyRef:
+                name: settl-secrets
+                key: SETTL_STORE_PHONE
+          resources: 
+            limits:
+              cpu: 200m
+              memory: 400Mi
+            requests:
+              cpu: 150m
+              memory: 200Mi
+          ports:
+          - containerPort: 80
+          imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: identityserver
+  namespace: <DEP_ENV>
+spec:
+  type: NodePort
+  selector:
+    app: identityserver
+  ports:
+    - name: http
+      port: 8009
+      targetPort: 80

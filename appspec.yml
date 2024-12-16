@@ -1,0 +1,27 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /home/ubuntu/identityserver
+file_exists_behavior: OVERWRITE
+permissions:
+  - object: /home/ubuntu/identityserver/
+    pattern: "**"
+    owner: ubuntu
+    group: ubuntu
+
+hooks:
+  ApplicationStop:
+    - location: scripts/stop.sh
+      runas: ubuntu
+      timeout: 1800
+
+  AfterInstall:
+    - location: scripts/aftinstall.sh
+      runas: ubuntu
+      timeout: 1800
+      
+  ApplicationStart:
+    - location: scripts/start.sh
+      timeout: 3600
+      runas: ubuntu

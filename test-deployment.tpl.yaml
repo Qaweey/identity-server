@@ -1,0 +1,183 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: identityserver-${BITBUCKET_BRANCH}
+  namespace: test
+spec:
+  selector:
+    matchLabels:
+      app: identityserver-${BITBUCKET_BRANCH}
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: identityserver-${BITBUCKET_BRANCH}
+    spec:
+      containers:
+        - name: identityserver-${BITBUCKET_BRANCH}
+          image: ${IMAGE_URL}/identityserver:${BITBUCKET_BRANCH}-${BITBUCKET_BUILD_NUMBER}
+          env:
+            - name: ELASTIC_APM_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: identityserver-secrets
+                  key: ELASTIC_APM_API_KEY
+            - name: ELASTIC_APM_ENVIRONMENT
+              valueFrom:
+                secretKeyRef:
+                  name: identityserver-secrets
+                  key: ELASTIC_APM_ENVIRONMENT
+            - name: ELASTIC_APM_HOSTNAME
+              valueFrom:
+                secretKeyRef:
+                  name: identityserver-secrets
+                  key: ELASTIC_APM_HOSTNAME
+            - name: ELASTIC_APM_SECRETTOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: identityserver-secrets
+                  key: ELASTIC_APM_SECRETTOKEN
+            - name: ELASTIC_APM_SERVER_URL
+              valueFrom:
+                secretKeyRef:
+                  name: identityserver-secrets
+                  key: ELASTIC_APM_SERVER_URL
+            - name: ASPNETCORE_ENVIRONMENT
+              valueFrom:
+                secretKeyRef:
+                  name: identityserver-secrets
+                  key: ASPNETCORE_ENVIRONMENT
+            - name: SMILEIDENTITY_CALLBACK
+              valueFrom:
+                secretKeyRef:
+                  name: identityserver-secrets
+                  key: SMILEIDENTITY_CALLBACK
+            - name: HANGFIREDB_CONN
+              valueFrom:
+                secretKeyRef:
+                  name: identityserver-secrets
+                  key: HANGFIREDB_CONN
+            - name: SETTL_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: identityserver-secrets
+                  key: SETTL_API_TOKEN
+            - name: SMILE_APIKEY
+              valueFrom:
+                secretKeyRef:
+                  name: identityserver-secrets
+                  key: SMILE_APIKEY
+            - name: SMILEIDENTITY_URL
+              valueFrom:
+                secretKeyRef:
+                  name: identityserver-secrets
+                  key: SMILEIDENTITY_URL
+            - name: IDENTITYSERVER_TOKEN_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: identityserver-secrets
+                  key: IDENTITYSERVER_TOKEN_ENDPOINT
+            - name: DB_CONNECTION
+              valueFrom:
+                secretKeyRef:
+                  name: identityserver-secrets
+                  key: DB_CONNECTION
+            - name: DB_CONNECTION2
+              valueFrom:
+                secretKeyRef:
+                  name: identityserver-secrets
+                  key: DB_CONNECTION2
+            - name: VENDINGPRODUCT_URL
+              valueFrom:
+                secretKeyRef:
+                  name: identityserver-secrets
+                  key: VENDINGPRODUCT_URL
+            - name: IDENTITYSERVER_URL
+              valueFrom:
+                secretKeyRef:
+                  name: identityserver-secrets
+                  key: IDENTITYSERVER_URL
+            - name: PRELAUNCH_URL
+              valueFrom:
+                secretKeyRef:
+                  name: identityserver-secrets
+                  key: PRELAUNCH_URL
+            - name: EMAILSERVICES_URL
+              valueFrom:
+                secretKeyRef:
+                  name: identityserver-secrets
+                  key: EMAILSERVICES_URL
+            - name: SMSSERVICE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: identityserver-secrets
+                  key: SMSSERVICE_URL
+            - name: BANKING_URL
+              valueFrom:
+                secretKeyRef:
+                  name: identityserver-secrets
+                  key: BANKING_URL
+            - name: AGENCYBANKING_URL
+              valueFrom:
+                secretKeyRef:
+                  name: identityserver-secrets
+                  key: AGENCYBANKING_URL
+            - name: BILLPAYMENTS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: identityserver-secrets
+                  key: BILLPAYMENTS_URL
+            - name: TRANSFERS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: identityserver-secrets
+                  key: TRANSFERS_URL
+            - name: CONSUMER_URL
+              valueFrom:
+                secretKeyRef:
+                  name: identityserver-secrets
+                  key: CONSUMER_URL
+            - name: USSDSERVICE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: identityserver-secrets
+                  key: USSDSERVICE_URL
+            - name: BACKOFFICE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: identityserver-secrets
+                  key: BACKOFFICE_URL
+            - name: CARDSERVICES_URL
+              valueFrom:
+                secretKeyRef:
+                  name: identityserver-secrets
+                  key: CARDSERVICES_URL
+            - name: MERCHANT_URL
+              valueFrom:
+                secretKeyRef:
+                  name: identityserver-secrets
+                  key: MERCHANT_URL
+          resources:
+            limits:
+              cpu: 200m
+              memory: 400Mi
+            requests:
+              cpu: 150m
+              memory: 200Mi
+          ports:
+            - containerPort: 80
+          imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: identityserver-${BITBUCKET_BRANCH}
+  namespace: test
+spec:
+  type: NodePort
+  selector:
+    app: identityserver-${BITBUCKET_BRANCH}
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
